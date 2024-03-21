@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { updateUser } from './usersSlice';
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://jsonplaceholder.typicode.com/' }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: () => '/users',
@@ -11,8 +11,8 @@ export const api = createApi({
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `users/${id}`,
-        method: 'DELETE'
-      })
+        method: 'DELETE',
+      }),
     }),
     addUser: builder.mutation({
       query: (newUser) => ({
@@ -21,8 +21,8 @@ export const api = createApi({
         body: newUser,
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
-        }
-      })
+        },
+      }),
     }),
     updateUser: builder.mutation({
       query: ({ id, updatedUser }) => ({
@@ -31,13 +31,15 @@ export const api = createApi({
         body: updatedUser,
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
-        }
+        },
+        invalidatesTags: ['User'],
       }),
-      onMutate: ({ id, updateUser }) => {
-        updateUser({ id, updateUser }); 
+      onMutate: ({ id, updatedUser }) => {
+        // You can perform optimistic updates here if needed
+        // For example, dispatch an action to update the local state
       },
-    })
-  })
+    }),
+  }),
 });
 
 export const { useGetUsersQuery, useDeleteUserMutation, useAddUserMutation, useUpdateUserMutation } = api;

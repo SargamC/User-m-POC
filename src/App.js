@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './components/Home';
+import Home from './Pages/Home';
 import AddUserForm from './components/AddUserForm';
-import Login from './components/Login';
+import Login from './Pages/Login';
 import PrivateRoute from './routes/PrivateRoute'; 
 import { Provider } from 'react-redux'; 
 import store from './store'; 

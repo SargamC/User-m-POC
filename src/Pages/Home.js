@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useGetUsersQuery, useDeleteUserMutation } from '../apiSlice';
+import { useGetUsersQuery, useDeleteUserMutation, useAddUserMutation, useUpdateUserMutation } from '../apiSlice';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import EditUserForm from './EditUserForm';
-import AddUserForm from './AddUserForm';
+import EditUserForm from '../components/UserForm'; // Import the UserForm component
 import { logout } from '../utils/auth';
+import MessageBox from '../components/MessageBox'; // Import the MessageBox component
 
 const Home = () => {
   const { data: users, error, isLoading } = useGetUsersQuery();
   const [deleteUserMutation] = useDeleteUserMutation();
+  const [addUserMutation] = useAddUserMutation();
+  const [updateUserMutation] = useUpdateUserMutation();
   const [selectedUserId, setSelectedUserId] = useState(null); 
-  const [showAddUserForm, setShowAddUserForm] = useState(false); 
+  const [showUserForm, setShowUserForm] = useState(false); 
   const [openDialog, setOpenDialog] = useState(false);
-  const [openEditUserDialog, setOpenEditUserDialog] = useState(false);
-  const navigate = useNavigate(); 
+
+  // State for managing message box
+  const [openMessageDialog, setOpenMessageDialog] = useState(false);
+  const [messageBoxMessage, setMessageBoxMessage] = useState('');
 
   useEffect(() => {
     if (error) {
@@ -32,9 +35,13 @@ const Home = () => {
       .then(() => {
         setOpenDialog(false);
         console.log('User deleted successfully');
+        setOpenMessageDialog(true);
+        setMessageBoxMessage('User deleted successfully');
       })
       .catch((error) => {
         console.error('Error deleting user:', error);
+        setOpenMessageDialog(true);
+        setMessageBoxMessage(`Error deleting user: ${error.message}`);
       });
   };
 
@@ -42,30 +49,45 @@ const Home = () => {
     setOpenDialog(false);
   };
 
-  const handleUpdateUser = (userId) => {
+  const handleAddOrUpdateUser = async (formData) => {
+    let message;
+    try {
+      if (selectedUserId) {
+        await updateUserMutation({ id: selectedUserId, updatedUser: formData });
+        message = 'User updated successfully';
+      } else {
+        await addUserMutation(formData);
+        message = 'User added successfully';
+      }
+      setOpenMessageDialog(true);
+      setMessageBoxMessage(message);
+    } catch (error) {
+      console.error('Error adding/updating user:', error);
+      setOpenMessageDialog(true);
+      setMessageBoxMessage(`Error: ${error.message}`);
+    }
+  };
+
+  const handleEditUser = (userId) => {
     setSelectedUserId(userId); 
-    setOpenEditUserDialog(true); 
+    setShowUserForm(true); 
   };
 
-  const handleCloseUpdateForm = () => {
+  const handleCloseUserForm = (operationCompleted) => {
+    if (operationCompleted) {
+      console.log('User operation completed');
+    }
     setSelectedUserId(null); 
-    setOpenEditUserDialog(false); 
-    console.log('User updated successfully');
-  };
-
-  const handleAddUserClick = () => {
-    setShowAddUserForm(true);
-  };
-
-  const handleAddUserFormClose = () => {
-    setShowAddUserForm(false);
-    console.log('User added successfully');
+    setShowUserForm(false); 
   };
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
-    console.log('Logout successful');
+    const logoutConfirmed = window.confirm('Are you sure you want to logout?');
+    if (logoutConfirmed) {
+      logout();
+      window.location.href = '/login'; // Redirect to login page after logout
+      console.log('Logout successful');
+    }
   };
 
   if (isLoading) {
@@ -75,7 +97,7 @@ const Home = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h2>User List</h2>
-      <Button variant="contained" color="success" onClick={handleAddUserClick} style={{ marginBottom: '20px' }}>Add User</Button>
+      <Button variant="contained" color="success" onClick={() => setShowUserForm(true)} style={{ marginBottom: '20px' }}>Add User</Button>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -93,7 +115,7 @@ const Home = () => {
                   <TableCell style={{ border: '1px solid #ddd' }}>{user.email}</TableCell>
                   <TableCell style={{ border: '1px solid #ddd' }}>
                     <Button variant="contained" color="error" onClick={() => handleDeleteUser(user.id)}>Delete</Button>
-                    <Button variant="contained" color="primary" style={{ marginLeft: '8px' }} onClick={() => handleUpdateUser(user.id)}>Update</Button>
+                    <Button variant="contained" color="primary" style={{ marginLeft: '8px' }} onClick={() => handleEditUser(user.id)}>Update</Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -101,7 +123,8 @@ const Home = () => {
         </Table>
       </TableContainer>
 
-      {}
+      <MessageBox open={openMessageDialog} onClose={() => setOpenMessageDialog(false)} message={messageBoxMessage} />
+
       <Dialog open={openDialog} onClose={cancelDelete}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
@@ -113,30 +136,13 @@ const Home = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={showAddUserForm} onClose={handleAddUserFormClose}>
-        <DialogTitle></DialogTitle>
+      <Dialog open={showUserForm} onClose={() => handleCloseUserForm(false)}>
+        <DialogTitle>{selectedUserId ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
-          {showAddUserForm && <AddUserForm onClose={handleAddUserFormClose} />}
+          {showUserForm && <EditUserForm user={users.find(user => user.id === selectedUserId)} onClose={(operationCompleted) => handleCloseUserForm(operationCompleted)} onAddOrUpdateUser={handleAddOrUpdateUser} />}
         </DialogContent>
       </Dialog>
 
-      {}
-      <Dialog open={openEditUserDialog} onClose={() => setOpenEditUserDialog(false)}>
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
-          {selectedUserId && (
-            <EditUserForm
-              user={users.find(user => user.id === selectedUserId)}
-              onClose={handleCloseUpdateForm}
-            />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseUpdateForm} color="primary">Cancel</Button>
-        </DialogActions>
-      </Dialog>
-
-      {}
       <Button variant="contained" color="secondary" onClick={handleLogout} style={{ marginTop: '20px' }}>Logout</Button>
     </div>
   );
