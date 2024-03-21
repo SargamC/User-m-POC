@@ -34,7 +34,7 @@ export const api = createApi({
         }
       }),
       onMutate: ({ id, updateUser }) => {
-        updateUser({ id, updateUser }); // Should be updateUser, not updatedUser
+        updateUser({ id, updateUser }); 
       },
     })
   })

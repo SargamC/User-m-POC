@@ -1,9 +1,9 @@
-// store.js
+
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducers'; 
 import { setupListeners } from '@reduxjs/toolkit/query'; 
 import { api } from './apiSlice';
-//import { buildGetDefaultMiddleware } from '@reduxjs/toolkit/dist/getDefaultMiddleware';
+
 import { getDefaultMiddleware } from '@reduxjs/toolkit';
 
 

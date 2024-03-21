@@ -11,7 +11,7 @@ const AddUserForm = ({ onClose }) => {
     try {
       await addUserMutation({ name, email });
       onClose();
-      console.log('User added'); // Display "User added" on the console
+      console.log('User added'); 
     } catch (error) {
       console.error('Error adding user:', error);
     }

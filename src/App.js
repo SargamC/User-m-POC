@@ -1,10 +1,10 @@
-// App.js
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import AddUserForm from './components/AddUserForm';
 import Login from './components/Login';
-import PrivateRoute from './routes/PrivateRoute'; // Import the PrivateRoute component
+import PrivateRoute from './routes/PrivateRoute'; 
 import { Provider } from 'react-redux'; 
 import store from './store'; 
 

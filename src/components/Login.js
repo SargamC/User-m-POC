@@ -1,4 +1,4 @@
-// Login.js
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../utils/auth';
@@ -10,11 +10,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // Implement your login logic here
-    // For example, call an API to authenticate the user
-    // If login is successful, store the token in local storage
+   
     login(username, password);
-    // Redirect to home page or any other protected route
+    
     navigate('/');
   };
 

@@ -101,7 +101,7 @@ const Home = () => {
         </Table>
       </TableContainer>
 
-      {/* Confirmation Dialog */}
+      {}
       <Dialog open={openDialog} onClose={cancelDelete}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
@@ -120,7 +120,7 @@ const Home = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit User Dialog */}
+      {}
       <Dialog open={openEditUserDialog} onClose={() => setOpenEditUserDialog(false)}>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
@@ -136,7 +136,7 @@ const Home = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Logout Button */}
+      {}
       <Button variant="contained" color="secondary" onClick={handleLogout} style={{ marginTop: '20px' }}>Logout</Button>
     </div>
   );

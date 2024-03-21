@@ -16,7 +16,7 @@ const EditUserForm = ({ user, onClose }) => {
   };
 
   if (!user) {
-    return <div>User not found</div>; // Handle case where user is not provided
+    return <div>User not found</div>; 
   }
 
   return (
